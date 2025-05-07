@@ -96,8 +96,8 @@ export default function Home() {
         />
       </div>
 
-      {/* Rating filter */}
-      <div className="mb-6 flex items-center">
+      {/* Search bar */}
+      <div className="flex items-center mb-6 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 p-2 rounded-lg shadow-md">
         <FaFilter className="text-teal-500 dark:text-teal-300 mr-3" />
         <label
           htmlFor="rating-filter"
@@ -107,7 +107,7 @@ export default function Home() {
         </label>
         <select
           id="rating-filter"
-          className="bg-transparent text-gray-800 dark:text-white border-none focus:outline-none focus:ring-2 focus:ring-teal-500 rounded-lg p-2"
+          className="bg-white dark:bg-gray-800 text-gray-800 dark:text-white border-none focus:outline-none focus:ring-2 focus:ring-teal-500 rounded-lg p-2"
           value={selectedRatingRange}
           onChange={(e) => setSelectedRatingRange(e.target.value)}
         >

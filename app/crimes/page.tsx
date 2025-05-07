@@ -92,7 +92,10 @@ export default function CrimeSearchPage() {
   };
 
   return (
-    <div className="bg-orange-100 dark:bg-orange-800 max-w-3xl mx-auto px-6 py-8 rounded-lg shadow-lg dark:text-white">
+    <div
+      id="thisone"
+      className="bg-white dark:bg-black max-w-3xl mx-auto px-6 py-8 rounded-lg shadow-lg dark:text-white"
+    >
       {/* Search bar */}
       <div className="flex items-center mb-6 bg-white dark:bg-gray-700 p-2 rounded-lg shadow-md">
         <FaSearch className="text-teal-500 dark:text-teal-300 mr-3" />
@@ -104,7 +107,6 @@ export default function CrimeSearchPage() {
           onChange={(e) => setQuery(e.target.value)}
         />
       </div>
-
       {/* Safety Rating Filter Dropdown */}
       <div className="mb-6 flex items-center">
         <FaFilter className="text-teal-500 dark:text-teal-300 mr-3" />
@@ -128,7 +130,6 @@ export default function CrimeSearchPage() {
           </select>
         </div>
       </div>
-
       {/* Loading and empty data messages */}
       {loading ? (
         <p className="text-gray-500 dark:text-gray-300">Loading...</p>
