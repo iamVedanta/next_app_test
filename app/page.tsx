@@ -14,6 +14,7 @@ type CrimeReport = {
   tags: string[];
   rating: number;
   createdAt: string;
+  crimes: string[];
 };
 
 export default function Home() {
@@ -32,6 +33,7 @@ export default function Home() {
       let supabaseQuery = supabase.from("crimedb").select("*");
 
       if (debouncedQuery.trim()) {
+        console.log("Searching with query:", debouncedQuery);
         supabaseQuery = supabaseQuery.or(
           `description.ilike.%${debouncedQuery}%,location.ilike.%${debouncedQuery}%`
         );
@@ -76,6 +78,23 @@ export default function Home() {
       "border-red-400",
     ];
     return colors[rating] || "border-gray-300";
+  };
+
+  const getBackgroundColor = (rating: number) => {
+    const colors = [
+      "bg-green-500",
+      "bg-green-400",
+      "bg-teal-500",
+      "bg-teal-400",
+      "bg-yellow-500",
+      "bg-yellow-400",
+      "bg-yellow-300",
+      "bg-orange-500",
+      "bg-orange-400",
+      "bg-red-500",
+      "bg-red-400",
+    ];
+    return colors[rating] || "bg-gray-300";
   };
 
   const handleCardClick = (crimeID: string) => {
@@ -154,20 +173,28 @@ export default function Home() {
                 </div>
 
                 <div className="mb-2">
-                  {report.tags?.map((tag, index) => (
-                    <span
-                      key={index}
-                      className="inline-block bg-teal-500 text-white px-3 py-1 rounded-full text-xs mr-2"
-                    >
-                      {tag}
-                    </span>
-                  ))}
+                  {report.crimes?.map((tag, index) => {
+                    const bgColorClass = getBackgroundColor(report.rating);
+                    return (
+                      <span
+                        key={index}
+                        className={`inline-block font-semibold ${bgColorClass} text-white px-3 py-1 rounded-full text-xs mr-2`}
+                      >
+                        {tag}
+                      </span>
+                    );
+                  })}
                 </div>
 
-                <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
+                <p
+                  className="text-lg  text-gray-800 dark:text-gray-100"
+                  style={{
+                    fontFamily: "Helvetica, sans-serif",
+                    fontSize: "14px",
+                  }}
+                >
                   {description}
-                </h2>
-
+                </p>
                 <div className="flex justify-between items-center mt-2 text-gray-600 dark:text-gray-300">
                   <div className="flex items-center">
                     <FaMapMarkerAlt className="text-orange-500 dark:text-orange-300 mr-1" />
@@ -188,7 +215,6 @@ export default function Home() {
                     </span>
                   </div>
                 </div>
-
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
                   Posted at: {date}
                 </p>
