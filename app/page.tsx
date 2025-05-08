@@ -104,7 +104,7 @@ export default function Home() {
   return (
     <div className="bg-orange-100 dark:bg-orange-800 max-w-3xl mx-auto px-6 py-8 rounded-lg shadow-lg dark:text-white">
       {/* Search bar */}
-      <div className="flex items-center mb-6 bg-white dark:bg-gray-700 p-2 rounded-lg shadow-md">
+      <div className="sticky top-0 z-50 mt-4 flex items-center mb-6 bg-white dark:bg-gray-700 p-2 rounded-lg shadow-md">
         <FaSearch className="text-teal-500 dark:text-teal-300 mr-3" />
         <input
           type="text"
