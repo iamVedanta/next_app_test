@@ -8,7 +8,7 @@ import { useDebounce } from "@/lib/useDebounce";
 import { FaMapMarkerAlt, FaSearch, FaFilter } from "react-icons/fa";
 
 type CrimeReport = {
-  crimeID: string;
+  id: string;
   description: string;
   location: string;
   tags: string[];
@@ -30,7 +30,7 @@ export default function Home() {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      let supabaseQuery = supabase.from("crimedb").select("*");
+      let supabaseQuery = supabase.from("CrimeDB").select("*");
 
       if (debouncedQuery.trim()) {
         console.log("Searching with query:", debouncedQuery);
@@ -97,8 +97,8 @@ export default function Home() {
     return colors[rating] || "bg-gray-300";
   };
 
-  const handleCardClick = (crimeID: string) => {
-    setExpandedDescription((prev) => (prev === crimeID ? null : crimeID));
+  const handleCardClick = (id: string) => {
+    setExpandedDescription((prev) => (prev === id ? null : id));
   };
 
   return (
@@ -149,16 +149,14 @@ export default function Home() {
           {reports.map((report) => {
             const isLong = report.description.length > 150;
             const description =
-              expandedDescription === report.crimeID
+              expandedDescription === report.id
                 ? report.description
                 : report.description.slice(0, 150) + (isLong ? "..." : "");
 
-            const date = new Date(report.createdAt).toLocaleDateString();
-
             return (
               <div
-                key={report.crimeID}
-                onClick={() => handleCardClick(report.crimeID)}
+                key={report.id}
+                onClick={() => handleCardClick(report.id)}
                 className={`p-5 rounded-xl shadow-md transition duration-300 ease-in-out ${getBorderColor(
                   report.rating
                 )} border-4 hover:shadow-lg cursor-pointer bg-white dark:bg-gray-700`}
@@ -215,8 +213,8 @@ export default function Home() {
                     </span>
                   </div>
                 </div>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                  Posted at: {date}
+                <p className="text-xs text-gray-500 dark:text-gray-200 mt-2">
+                  Posted at: {report.createdAt || "No timestamp"}
                 </p>
               </div>
             );
