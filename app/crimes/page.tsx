@@ -27,39 +27,40 @@ export default function CrimeSearchPage() {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
+
+      // Start building the query
       let supabaseQuery = supabase.from("crimedb").select("*");
 
+      // Apply search filter on location and description
       if (debouncedQuery.trim()) {
-        supabaseQuery = supabaseQuery
-          .ilike("description", `%${debouncedQuery}%`) // Case-insensitive match for description
-          .or(`location.ilike.%${debouncedQuery}%`); // Case-insensitive match for location
+        supabaseQuery = supabaseQuery.or(
+          `description.ilike.%${debouncedQuery}%,location.ilike.%${debouncedQuery}%`
+        );
       }
 
+      // Apply rating range filter
       if (selectedRatingRange !== "all") {
-        let minRating = 0;
-        let maxRating = 10;
-        if (selectedRatingRange === "0-3") {
-          minRating = 0;
-          maxRating = 3;
-        } else if (selectedRatingRange === "4-6") {
-          minRating = 4;
-          maxRating = 6;
-        } else if (selectedRatingRange === "7-10") {
-          minRating = 7;
-          maxRating = 10;
-        }
+        let [minRating, maxRating] = [0, 10];
+        if (selectedRatingRange === "0-3") [minRating, maxRating] = [0, 3];
+        else if (selectedRatingRange === "4-6") [minRating, maxRating] = [4, 6];
+        else if (selectedRatingRange === "7-10")
+          [minRating, maxRating] = [7, 10];
+
         supabaseQuery = supabaseQuery
           .gte("rating", minRating)
           .lte("rating", maxRating);
       }
 
+      // Execute the query
       const { data, error } = await supabaseQuery;
+
       if (error) {
-        console.error("Error fetching crimes:", error);
+        console.error("Error fetching data:", error);
         setReports([]);
       } else {
         setReports(data as CrimeReport[]);
       }
+
       setLoading(false);
     };
 

@@ -3,8 +3,8 @@ import "./globals.css";
 import "../styles/styles.css";
 
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase"; // Ensure this is set up correctly
-import { useDebounce } from "@/lib/useDebounce"; // Make sure this exists
+import { supabase } from "@/lib/supabase";
+import { useDebounce } from "@/lib/useDebounce";
 import { FaMapMarkerAlt, FaSearch, FaFilter } from "react-icons/fa";
 
 type CrimeReport = {
@@ -32,9 +32,9 @@ export default function Home() {
       let supabaseQuery = supabase.from("crimedb").select("*");
 
       if (debouncedQuery.trim()) {
-        supabaseQuery = supabaseQuery
-          .ilike("description", `%${debouncedQuery}%`)
-          .or(`location.ilike.%${debouncedQuery}%`);
+        supabaseQuery = supabaseQuery.or(
+          `description.ilike.%${debouncedQuery}%,location.ilike.%${debouncedQuery}%`
+        );
       }
 
       if (selectedRatingRange !== "all") {
@@ -96,7 +96,7 @@ export default function Home() {
         />
       </div>
 
-      {/* Search bar */}
+      {/* Filter */}
       <div className="flex items-center mb-6 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 p-2 rounded-lg shadow-md">
         <FaFilter className="text-teal-500 dark:text-teal-300 mr-3" />
         <label
