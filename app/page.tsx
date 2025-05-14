@@ -1,7 +1,7 @@
 "use client";
 import "./globals.css";
 import "../styles/styles.css";
-
+import { format } from "date-fns";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useDebounce } from "@/lib/useDebounce";
@@ -13,7 +13,7 @@ type CrimeReport = {
   location: string;
   tags: string[];
   rating: number;
-  createdAt: string;
+  created_at: string;
   crimes: string[];
 };
 
@@ -214,7 +214,7 @@ export default function Home() {
                   </div>
                 </div>
                 <p className="text-xs text-gray-500 dark:text-gray-200 mt-2">
-                  Posted at: {report.createdAt || "No timestamp"}
+                  {format(new Date(report.created_at), "PPpp")}
                 </p>
               </div>
             );
