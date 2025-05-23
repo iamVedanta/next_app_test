@@ -28,3 +28,175 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+
+/* Apply general Twitter-like UI styling */
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  background-color: #f0f2f5;
+  color: #0f1419;
+}
+
+.dark body {
+  background-color: #15202b;
+  color: #d9d9d9;
+}
+
+/* Input Fields */
+input[type="text"],
+select,
+.react-datepicker-wrapper input {
+  border: none;
+  border-radius: 9999px;
+  padding: 10px 16px;
+  background-color: #eff3f4;
+  color: #0f1419;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.dark input[type="text"],
+.dark select,
+.dark .react-datepicker-wrapper input {
+  background-color: #253341;
+  color: #d9d9d9;
+}
+
+input:focus,
+select:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #1d9bf0;
+}
+
+/* Search Bar */
+.sticky-top-bar {
+  background-color: white;
+  z-index: 50;
+  padding: 10px 16px;
+  border-bottom: 1px solid #e1e8ed;
+}
+
+.dark .sticky-top-bar {
+  background-color: #192734;
+  border-color: #38444d;
+}
+
+/* Cards */
+.report-card {
+  background-color: white;
+  border-radius: 20px;
+  padding: 16px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.2s ease;
+  border: 1px solid #e6ecf0;
+}
+
+.report-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.dark .report-card {
+  background-color: #243447;
+  border-color: #38444d;
+}
+
+/* Tags */
+.tag-pill {
+  background-color: #1d9bf0;
+  color: white;
+  font-size: 12px;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-weight: 600;
+  margin-right: 6px;
+}
+
+/* Avatar */
+.avatar {
+  width: 32px;
+  height: 32px;
+  background-color: #657786;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+/* Font tweaks */
+.text-sm {
+  font-size: 14px;
+}
+
+.text-xs {
+  font-size: 12px;
+}
+
+/* Datepicker fix */
+.react-datepicker-wrapper {
+  width: auto;
+}
+
+/* Responsive wrapper */
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+
+.container {
+  display: flex;
+  justify-content: space-between;
+  padding: 20px;
+}
+
+.main-feed {
+  flex: 3;
+  margin-right: 20px;
+}
+
+.whats-happening {
+  flex: 1;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  display: none; /* Hidden on mobile */
+}
+
+.whats-happening h2 {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+  color: #00796b;
+}
+
+.whats-happening ul {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.whats-happening li {
+  margin-bottom: 10px;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+#show-more-btn {
+  background-color: #00796b;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  margin-top: 10px;
+}
+
+/* Display only on desktop */
+@media (min-width: 992px) {
+  .whats-happening {
+    display: block;
+  }
+}

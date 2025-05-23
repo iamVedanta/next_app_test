@@ -8,6 +8,7 @@ import { useDebounce } from "@/lib/useDebounce";
 import { FaMapMarkerAlt, FaSearch, FaFilter } from "react-icons/fa";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import WhatsHappening from "./WhatsHappening";
 
 type CrimeReport = {
   id: string;
@@ -94,7 +95,14 @@ export default function Home() {
     };
 
     fetchData();
-  }, [debouncedQuery, selectedRatingRange, dateRange, selectedDateRangeOption]);
+  }, [
+    debouncedQuery,
+    selectedRatingRange,
+    dateRange,
+    selectedDateRangeOption,
+    startDate,
+    endDate,
+  ]);
 
   const getBorderColor = (rating: number) => {
     const colors = [
@@ -140,159 +148,163 @@ export default function Home() {
   };
 
   return (
-    <div className="bg-orange-100 dark:bg-orange-800 max-w-3xl mx-auto px-6 py-8 rounded-lg shadow-lg dark:text-white">
-      {/* Search bar */}
-      <div className="sticky top-0 z-50 mt-4 flex items-center mb-6 bg-white dark:bg-gray-700 p-2 rounded-lg shadow-md">
-        <FaSearch className="text-teal-500 dark:text-teal-300 mr-3" />
-        <input
-          type="text"
-          placeholder="Search by description or location..."
-          className="w-full px-4 py-2 border-none focus:outline-none focus:ring-2 focus:ring-teal-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white rounded-lg"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
-      </div>
+    <div className="flex flex-col lg:flex-row lg:justify-between px-4 lg:px-20 py-8">
+      <div className="dark:bg-orange-800 max-w-3xl mx-auto px-6 py-8 rounded-lg shadow-lg dark:text-white main-feed">
+        {/* Search bar */}
+        <div className="sticky top-0 z-50 mt-4 flex items-center mb-6 bg-white dark:bg-gray-700 p-2 rounded-lg shadow-md">
+          <FaSearch className="text-teal-500 dark:text-teal-300 mr-3" />
+          <input
+            type="text"
+            placeholder="Search by description or location..."
+            className="w-full px-4 py-2 border-none focus:outline-none focus:ring-2 focus:ring-teal-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white rounded-lg"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+        </div>
 
-      {/* Filters */}
-      <div className="flex flex-wrap gap-4 items-center mb-6 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 p-4 rounded-lg shadow-md">
-        <FaFilter className="text-teal-500 dark:text-teal-300 mr-2" />
+        {/* Filters */}
+        <div className="flex flex-wrap gap-4 items-center mb-6 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 p-4 rounded-lg shadow-md">
+          <FaFilter className="text-teal-500 dark:text-teal-300 mr-2" />
 
-        <label htmlFor="rating-filter" className="font-semibold text-sm">
-          Rating:
-        </label>
-        <select
-          id="rating-filter"
-          className="bg-white dark:bg-gray-700 text-gray-800 dark:text-white border-none focus:outline-none focus:ring-2 focus:ring-teal-500 rounded-lg p-2"
-          value={selectedRatingRange}
-          onChange={(e) => setSelectedRatingRange(e.target.value)}
-        >
-          <option value="all">All Ratings</option>
-          <option value="0-3">0–3 (Low Risk)</option>
-          <option value="4-6">4–6 (Medium Risk)</option>
-          <option value="7-10">7–10 (High Risk)</option>
-        </select>
+          <label htmlFor="rating-filter" className="font-semibold text-sm">
+            Rating:
+          </label>
+          <select
+            id="rating-filter"
+            className="bg-white dark:bg-gray-700 text-gray-800 dark:text-white border-none focus:outline-none focus:ring-2 focus:ring-teal-500 rounded-lg p-2"
+            value={selectedRatingRange}
+            onChange={(e) => setSelectedRatingRange(e.target.value)}
+          >
+            <option value="all">All Ratings</option>
+            <option value="0-3">0–3 (Low Risk)</option>
+            <option value="4-6">4–6 (Medium Risk)</option>
+            <option value="7-10">7–10 (High Risk)</option>
+          </select>
 
-        <label htmlFor="date-filter" className="font-semibold text-sm ml-4">
-          Date:
-        </label>
-        <select
-          id="date-filter"
-          className="bg-white dark:bg-gray-700 text-gray-800 dark:text-white border-none focus:outline-none focus:ring-2 focus:ring-teal-500 rounded-lg p-2"
-          value={selectedDateRangeOption}
-          onChange={(e) => {
-            setSelectedDateRangeOption(e.target.value);
-            if (e.target.value !== "range") {
-              setDateRange([null, null]);
-            }
-          }}
-        >
-          <option value="all">All Dates</option>
-          <option value="last24h">Last 24 Hours</option>
-          <option value="last7d">Last 7 Days</option>
-          <option value="last30d">Last 30 Days</option>
-          <option value="range">Date Range</option>
-        </select>
+          <label htmlFor="date-filter" className="font-semibold text-sm ml-4">
+            Date:
+          </label>
+          <select
+            id="date-filter"
+            className="bg-white dark:bg-gray-700 text-gray-800 dark:text-white border-none focus:outline-none focus:ring-2 focus:ring-teal-500 rounded-lg p-2"
+            value={selectedDateRangeOption}
+            onChange={(e) => {
+              setSelectedDateRangeOption(e.target.value);
+              if (e.target.value !== "range") {
+                setDateRange([null, null]);
+              }
+            }}
+          >
+            <option value="all">All Dates</option>
+            <option value="last24h">Last 24 Hours</option>
+            <option value="last7d">Last 7 Days</option>
+            <option value="last30d">Last 30 Days</option>
+            <option value="range">Date Range</option>
+          </select>
 
-        {selectedDateRangeOption === "range" && (
-          <div className="flex items-center ml-4">
-            <DatePicker
-              selectsRange={true}
-              startDate={startDate}
-              endDate={endDate}
-              onChange={(update) => handleDateRangeChange(update)}
-              isClearable={true}
-              dateFormat="dd/MM/yyyy"
-              placeholderText="Select Date Range"
-              className="bg-white dark:bg-gray-700 text-gray-800 dark:text-white border-none focus:outline-none focus:ring-2 focus:ring-teal-500 rounded-lg p-2 text-sm"
-            />
+          {selectedDateRangeOption === "range" && (
+            <div className="flex items-center ml-4">
+              <DatePicker
+                selectsRange={true}
+                startDate={startDate}
+                endDate={endDate}
+                onChange={(update) => handleDateRangeChange(update)}
+                isClearable={true}
+                dateFormat="dd/MM/yyyy"
+                placeholderText="Select Date Range"
+                className="bg-white dark:bg-gray-700 text-gray-800 dark:text-white border-none focus:outline-none focus:ring-2 focus:ring-teal-500 rounded-lg p-2 text-sm"
+              />
+            </div>
+          )}
+        </div>
+
+        {/* Results */}
+        {loading ? (
+          <p className="text-gray-500 dark:text-gray-300">Loading...</p>
+        ) : reports.length === 0 ? (
+          <p className="text-gray-500 dark:text-gray-300">
+            No matching reports found.
+          </p>
+        ) : (
+          <div className="space-y-4">
+            {reports.map((report) => {
+              const isLong = report.description.length > 150;
+              const description =
+                expandedDescription === report.id
+                  ? report.description
+                  : report.description.slice(0, 150) + (isLong ? "..." : "");
+
+              return (
+                <div
+                  key={report.id}
+                  onClick={() => handleCardClick(report.id)}
+                  className={`p-5 rounded-xl shadow-md transition duration-300 ease-in-out ${getBorderColor(
+                    report.rating
+                  )} border-4 hover:shadow-lg cursor-pointer bg-white dark:bg-gray-700`}
+                >
+                  <div className="flex items-center mb-4">
+                    <div className="bg-gray-400 rounded-full w-8 h-8 flex items-center justify-center text-white font-bold text-xs">
+                      A
+                    </div>
+                    <p className="ml-4 text-gray-800 dark:text-gray-100 font-semibold text-sm">
+                      Anonymous User
+                    </p>
+                  </div>
+
+                  <div className="mb-2">
+                    {report.crimes?.map((tag, index) => (
+                      <span
+                        key={index}
+                        className={`inline-block font-semibold ${getBackgroundColor(
+                          report.rating
+                        )} text-white px-3 py-1 rounded-full text-xs mr-2`}
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+
+                  <p
+                    className="text-lg text-gray-800 dark:text-gray-100"
+                    style={{
+                      fontFamily: "Helvetica, sans-serif",
+                      fontSize: "14px",
+                    }}
+                  >
+                    {description}
+                  </p>
+
+                  <div className="flex justify-between items-center mt-2 text-gray-600 dark:text-gray-300">
+                    <div className="flex items-center">
+                      <FaMapMarkerAlt className="text-orange-500 dark:text-orange-300 mr-1" />
+                      <p>{report.location}</p>
+                    </div>
+                    <div className="text-right mt-2 md:mt-0">
+                      <span className="font-semibold">Safety Rating: </span>
+                      <span
+                        className={`transition duration-300 ease-in-out ${
+                          report.rating <= 3
+                            ? "text-green-500"
+                            : report.rating <= 6
+                            ? "text-yellow-400"
+                            : "text-red-500"
+                        }`}
+                      >
+                        {report.rating}
+                      </span>
+                    </div>
+                  </div>
+                  <p className="text-xs text-gray-500 dark:text-gray-200 mt-2">
+                    {format(new Date(report.created_at), "d MMMM yyyy, h:mm a")}
+                  </p>
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
 
-      {/* Results */}
-      {loading ? (
-        <p className="text-gray-500 dark:text-gray-300">Loading...</p>
-      ) : reports.length === 0 ? (
-        <p className="text-gray-500 dark:text-gray-300">
-          No matching reports found.
-        </p>
-      ) : (
-        <div className="space-y-4">
-          {reports.map((report) => {
-            const isLong = report.description.length > 150;
-            const description =
-              expandedDescription === report.id
-                ? report.description
-                : report.description.slice(0, 150) + (isLong ? "..." : "");
-
-            return (
-              <div
-                key={report.id}
-                onClick={() => handleCardClick(report.id)}
-                className={`p-5 rounded-xl shadow-md transition duration-300 ease-in-out ${getBorderColor(
-                  report.rating
-                )} border-4 hover:shadow-lg cursor-pointer bg-white dark:bg-gray-700`}
-              >
-                <div className="flex items-center mb-4">
-                  <div className="bg-gray-400 rounded-full w-8 h-8 flex items-center justify-center text-white font-bold text-xs">
-                    A
-                  </div>
-                  <p className="ml-4 text-gray-800 dark:text-gray-100 font-semibold text-sm">
-                    Anonymous User
-                  </p>
-                </div>
-
-                <div className="mb-2">
-                  {report.crimes?.map((tag, index) => (
-                    <span
-                      key={index}
-                      className={`inline-block font-semibold ${getBackgroundColor(
-                        report.rating
-                      )} text-white px-3 py-1 rounded-full text-xs mr-2`}
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-
-                <p
-                  className="text-lg text-gray-800 dark:text-gray-100"
-                  style={{
-                    fontFamily: "Helvetica, sans-serif",
-                    fontSize: "14px",
-                  }}
-                >
-                  {description}
-                </p>
-
-                <div className="flex justify-between items-center mt-2 text-gray-600 dark:text-gray-300">
-                  <div className="flex items-center">
-                    <FaMapMarkerAlt className="text-orange-500 dark:text-orange-300 mr-1" />
-                    <p>{report.location}</p>
-                  </div>
-                  <div className="text-right mt-2 md:mt-0">
-                    <span className="font-semibold">Safety Rating: </span>
-                    <span
-                      className={`transition duration-300 ease-in-out ${
-                        report.rating <= 3
-                          ? "text-green-500"
-                          : report.rating <= 6
-                          ? "text-yellow-400"
-                          : "text-red-500"
-                      }`}
-                    >
-                      {report.rating}
-                    </span>
-                  </div>
-                </div>
-                <p className="text-xs text-gray-500 dark:text-gray-200 mt-2">
-                  {format(new Date(report.created_at), "d MMMM yyyy, h:mm a")}
-                </p>
-              </div>
-            );
-          })}
-        </div>
-      )}
+      <WhatsHappening />
     </div>
   );
 }
