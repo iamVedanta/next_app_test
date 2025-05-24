@@ -5,7 +5,14 @@ import { format, subDays } from "date-fns";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useDebounce } from "@/lib/useDebounce";
-import { FaMapMarkerAlt, FaSearch, FaFilter } from "react-icons/fa";
+import CommentModal from "./CommentModal";
+import {
+  FaMapMarkerAlt,
+  FaSearch,
+  FaFilter,
+  FaShareAlt,
+  FaCommentDots,
+} from "react-icons/fa";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import WhatsHappening from "./WhatsHappening";
@@ -36,6 +43,31 @@ export default function Home() {
   const [expandedDescription, setExpandedDescription] = useState<string | null>(
     null
   );
+  const [isCommentOpen, setIsCommentOpen] = useState<boolean>(false);
+  const [activeReportId, setActiveReportId] = useState<string | number | null>(
+    null
+  );
+  const [commentText, setCommentText] = useState<string>("");
+
+  const handleCommentClick = (id: string | number) => {
+    setActiveReportId(id);
+    setIsCommentOpen(true);
+  };
+
+  const handleCommentSubmit = (comment: string, reportId: string | number) => {
+    console.log("Submitted Comment:", comment, "for Report ID:", reportId);
+    // Add API call or logic here
+  };
+
+  const handleShare = (id: string | number) => {
+    // logic for sharing (e.g., copy link, invoke share API)
+    console.log("Share clicked for report ID:", id);
+  };
+
+  const handleComment = (id: string | number) => {
+    // logic for opening comment section/modal
+    console.log("Comment clicked for report ID:", id);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -297,6 +329,31 @@ export default function Home() {
                   <p className="text-xs text-gray-500 dark:text-gray-200 mt-2">
                     {format(new Date(report.created_at), "d MMMM yyyy, h:mm a")}
                   </p>
+
+                  <div className="flex justify-end space-x-4 mt-4">
+                    <button
+                      onClick={() => handleShare(report.id)}
+                      className="flex items-center space-x-1 text-blue-500 hover:text-blue-700 text-sm font-medium"
+                    >
+                      <FaShareAlt />
+                      <span>Share</span>
+                    </button>
+                    <button
+                      onClick={() => handleComment(report.id)}
+                      className="flex items-center space-x-1 text-green-600 hover:text-green-800 text-sm font-medium"
+                    >
+                      <FaCommentDots />
+                      {/* <span>Comment</span> */}
+                      <CommentModal
+                        isOpen={isCommentOpen}
+                        onClose={() => setIsCommentOpen(false)}
+                        onSubmit={handleCommentSubmit}
+                        reportId={activeReportId}
+                        commentText={commentText}
+                        setCommentText={setCommentText}
+                      />
+                    </button>
+                  </div>
                 </div>
               );
             })}
