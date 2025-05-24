@@ -49,11 +49,6 @@ export default function Home() {
   );
   const [commentText, setCommentText] = useState<string>("");
 
-  const handleCommentClick = (id: string | number) => {
-    setActiveReportId(id);
-    setIsCommentOpen(true);
-  };
-
   const handleCommentSubmit = (comment: string, reportId: string | number) => {
     console.log("Submitted Comment:", comment, "for Report ID:", reportId);
     // Add API call or logic here
@@ -73,7 +68,7 @@ export default function Home() {
     const fetchData = async () => {
       setLoading(true);
       let supabaseQuery = supabase.from("CrimeDB").select("*");
-
+      setActiveReportId(null);
       // Search filter
       if (debouncedQuery.trim()) {
         console.log("Searching with query:", debouncedQuery);
