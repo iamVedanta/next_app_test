@@ -48,7 +48,7 @@ export default function WhatsHappening() {
   }, [limit]);
 
   const handlePostClick = (id: string) => {
-    router.push(`/posts/${id}`);
+    router.push(`/reports/${id}`);
   };
 
   const showMore = () => {
