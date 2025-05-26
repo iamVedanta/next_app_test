@@ -14,18 +14,10 @@ interface ReportCardDetailProps {
     created_at: string;
     crimes: string[];
   };
-  // No more `isExpanded` prop for this component, as the Link handles navigation
 }
 
 export default function ReportCardDetail({ report }: ReportCardDetailProps) {
-  // Description truncation logic now goes *only* in app/page.tsx
-  // This component will always display the full description (or be responsible for it
-  // if you want to pass a prop for truncation in the list view)
-
   return (
-    // Wrap the card in a Link component.
-    // When clicked, this will navigate to /reports/<report.id>
-
     <div
       className={`p-5 rounded-xl shadow-md transition duration-300 ease-in-out border border-gray-200 dark:border-gray-600 hover:shadow-lg cursor-pointer bg-white dark:bg-gray-700`}
     >
