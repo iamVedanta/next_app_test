@@ -1,10 +1,13 @@
 // app/components/ReportCardDetail.tsx
+import { useState } from "react";
 import { format } from "date-fns";
-import { FaMapMarkerAlt } from "react-icons/fa";
+// import { FaMapMarkerAlt } from "react-icons/fa";
 import Link from "next/link"; // Import Link for navigation
 import UpvoteButton from "../Upvotebutton";
 import Downvotebutton from "../Downvotebutton";
 import ShareButton from "../ShareButton";
+import LocationIcon from "../LocationIcon";
+
 interface ReportCardDetailProps {
   report: {
     id: string;
@@ -18,6 +21,8 @@ interface ReportCardDetailProps {
 }
 
 export default function ReportCardDetail({ report }: ReportCardDetailProps) {
+  const [showFullLocation, setShowFullLocation] = useState(false);
+
   return (
     <div
       className={`p-5 rounded-xl shadow-md transition duration-300 ease-in-out border border-gray-200 dark:border-gray-600 hover:shadow-lg cursor-pointer bg-white dark:bg-gray-700`}
@@ -50,29 +55,72 @@ export default function ReportCardDetail({ report }: ReportCardDetailProps) {
             fontSize: "14px",
           }}
         >
-          {/* This component will now primarily show the full description,
-              as its purpose is often for the detail page or a card that
-              links to a detail. For truncation in the list, we'll handle it
-              in the parent (app/page.tsx) directly before passing the prop. */}
           {report.description}
         </p>
 
-        <div className="flex justify-between items-center mt-2 text-gray-600 dark:text-gray-300">
-          <div className="flex items-center">
-            <FaMapMarkerAlt className="text-gray-500 dark:text-gray-300 mr-1" />
-            <p>{report.location}</p>
+        <div className="flex justify-between items-center mt-2 text-gray-600 dark:text-gray-300 relative">
+          {/* Clickable truncated location */}
+          <div
+            className="flex items-center max-w-[70%] cursor-pointer select-text"
+            onClick={(e) => {
+              e.preventDefault();
+              setShowFullLocation(!showFullLocation);
+            }}
+            aria-label="Click to see full location"
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                setShowFullLocation(!showFullLocation);
+              }
+            }}
+          >
+            {/* <FaMapMarkerAlt className="text-gray-500 dark:text-gray-300 mr-1 flex-shrink-0" /> */}
+
+            <LocationIcon reportId={report.id} />
+
+            <p
+              className="truncate"
+              style={{ minWidth: 0, marginLeft: "0.5rem" }}
+            >
+              {report.location}
+            </p>
           </div>
+
           <div className="text-right mt-2 md:mt-0">
             <span className="font-semibold">Safety Rating: </span>
             <span className="text-gray-700 dark:text-gray-200">
-              {report.rating}
+              {Math.abs(10 - report.rating) ? Math.abs(10 - report.rating) : 1}
             </span>
           </div>
+
+          {/* Popup for full location */}
+          {showFullLocation && (
+            <div
+              className="absolute top-full left-0 z-10 mt-1 w-max max-w-xs p-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded shadow-lg border border-gray-300 dark:border-gray-600 break-words"
+              onClick={(e) => e.stopPropagation()} // prevent Link click
+            >
+              {report.location}
+              <button
+                className="ml-2 text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowFullLocation(false);
+                }}
+                aria-label="Close full location popup"
+              >
+                ×
+              </button>
+            </div>
+          )}
         </div>
+
         <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
           {format(new Date(report.created_at), "d MMMM yyyy, h:mm a")}
         </p>
       </Link>
+
       <div className="flex justify-end space-x-4 mt-2">
         <UpvoteButton id={report.id} />
 
