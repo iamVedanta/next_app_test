@@ -4,6 +4,7 @@ import { FaMapMarkerAlt } from "react-icons/fa";
 import Link from "next/link"; // Import Link for navigation
 import UpvoteButton from "../Upvotebutton";
 import Downvotebutton from "../Downvotebutton";
+import ShareButton from "../ShareButton";
 interface ReportCardDetailProps {
   report: {
     id: string;
@@ -76,6 +77,8 @@ export default function ReportCardDetail({ report }: ReportCardDetailProps) {
         <UpvoteButton id={report.id} />
 
         <Downvotebutton id={report.id} />
+
+        <ShareButton reportId={report.id} />
       </div>
     </div>
   );
