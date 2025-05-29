@@ -1,105 +1,121 @@
-import React, { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
-import { v4 as uuidv4 } from "uuid";
-
-type Props = {
-  reportId: string | number;
-};
-
-interface Comment {
+import { useState } from "react";
+import { MessageCircle, Send } from "lucide-react";
+import { Button } from "./components/ui/button";
+import { Textarea } from "./components/ui/textarea";
+import Comment from "./Comment";
+import { supabase } from "@/lib/supabase"; // Adjust the import path as necessary
+interface CommentData {
   comment_id: string;
+  report_id: string;
+  user_id: string;
   comment: string;
   created_at?: string;
 }
 
-const CommentSection: React.FC<Props> = ({ reportId }) => {
-  const [comments, setComments] = useState<Comment[]>([]);
+interface CommentSectionProps {
+  reportId: string;
+  initialComments?: CommentData[];
+}
+
+export default function CommentSection({
+  reportId,
+  initialComments = [],
+}: CommentSectionProps) {
+  const [comments, setComments] = useState<CommentData[]>(initialComments);
   const [newComment, setNewComment] = useState("");
-
-  useEffect(() => {
-    const fetchComments = async () => {
-      const { data, error } = await supabase
-        .from("commentDB")
-        .select("comment_id, comment, created_at")
-        .eq("report_id", reportId)
-        .order("created_at", { ascending: true });
-
-      if (error) {
-        console.error("Error fetching comments:", error);
-      } else {
-        setComments(data || []);
-      }
-    };
-
-    fetchComments();
-  }, [reportId]);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const handleAddComment = async () => {
-    if (!newComment.trim()) return;
+    const trimmedComment = newComment.trim();
+    if (!trimmedComment) return;
 
-    const commentId = uuidv4();
-
-    const { error } = await supabase.from("commentDB").insert({
-      comment_id: commentId,
+    const newCommentData: Omit<CommentData, "comment_id"> = {
       report_id: reportId,
-      comment: newComment.trim(),
-    });
+      user_id: "00000000-0000-0000-0000-000000000000", // Replace with actual user ID
+      comment: trimmedComment,
+    };
 
-    if (error) {
-      console.error("Error adding comment:", error);
-    } else {
-      setComments((prev) => [
-        ...prev,
-        { comment_id: commentId, comment: newComment.trim() },
-      ]);
+    try {
+      const { data, error } = await supabase
+        .from("commentDB")
+        .insert([newCommentData])
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      const createdComment: CommentData = {
+        ...data,
+        comment_id: data.comment_id,
+        created_at: data.created_at,
+      };
+
+      setComments((prev) => [createdComment, ...prev]);
       setNewComment("");
+    } catch (error) {
+      console.error("Error posting comment to Supabase:", error);
+      // Optionally show an error message to the user
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleAddComment();
     }
   };
 
   return (
-    <div style={{ marginTop: "1rem" }}>
-      <h3>Comments</h3>
-      <div>
-        {comments.map((comment) => (
-          <div
-            key={comment.comment_id}
-            style={{
-              backgroundColor: "#f1f1f1",
-              padding: "8px",
-              marginBottom: "6px",
-              borderRadius: "4px",
-            }}
-          >
-            {comment.comment}
+    <div className="border-t border-gray-100 dark:border-gray-700 pt-4 mt-4">
+      {/* Comments Toggle */}
+      <button
+        onClick={() => setIsExpanded(!isExpanded)}
+        className="flex items-center space-x-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors mb-3"
+      >
+        <MessageCircle className="w-4 h-4" />
+        <span className="text-sm font-medium">
+          Comments ({comments.length})
+        </span>
+      </button>
+
+      {isExpanded && (
+        <div className="space-y-4">
+          {/* Add Comment Form */}
+          <div className="space-y-3">
+            <Textarea
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              onKeyPress={handleKeyPress}
+              placeholder="Add a comment..."
+              className="min-h-[80px] resize-none"
+            />
+            <div className="flex justify-end">
+              <Button
+                onClick={handleAddComment}
+                disabled={!newComment.trim()}
+                size="sm"
+                className="flex items-center space-x-2"
+              >
+                <Send className="w-4 h-4" />
+                <span>Post Comment</span>
+              </Button>
+            </div>
           </div>
-        ))}
-      </div>
-      <div style={{ marginTop: "1rem" }}>
-        <textarea
-          rows={3}
-          style={{ width: "100%", padding: "8px", borderRadius: "4px" }}
-          value={newComment}
-          onChange={(e) => setNewComment(e.target.value)}
-          placeholder="Write a comment..."
-        />
-        <button
-          onClick={handleAddComment}
-          style={{
-            marginTop: "0.5rem",
-            backgroundColor: "#27ae60",
-            color: "white",
-            border: "none",
-            padding: "8px 16px",
-            borderRadius: "5px",
-            cursor: "pointer",
-            fontWeight: "bold",
-          }}
-        >
-          Add Comment
-        </button>
-      </div>
+
+          {/* Comments List */}
+          <div className="space-y-3 max-h-96 overflow-y-auto">
+            {comments.length === 0 ? (
+              <p className="text-gray-500 dark:text-gray-400 text-sm text-center py-4">
+                No comments yet. Be the first to comment!
+              </p>
+            ) : (
+              comments.map((comment) => (
+                <Comment key={comment.comment_id} comment={comment} />
+              ))
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
-};
-
-export default CommentSection;
+}
