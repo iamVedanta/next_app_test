@@ -2,26 +2,32 @@
 
 import { FaSearch } from "react-icons/fa";
 
-// Define the interface for your component's props
 interface SearchBarProps {
   query: string;
-  onQueryChange: (query: string) => void; // This is a function that takes a string and returns void
-  // Or, if you prefer to be explicit about React's setState function:
-  // onQueryChange: Dispatch<SetStateAction<string>>;
+  onQueryChange: (query: string) => void;
 }
 
-// Ensure the props are correctly destructured and typed in the function signature
 export default function SearchBar({ query, onQueryChange }: SearchBarProps) {
   return (
-    <div className="sticky top-0 z-50 mt-4 flex items-center mb-6 bg-gray-100 dark:bg-gray-700 p-2 rounded-lg shadow-md border border-gray-200 dark:border-gray-600">
-      <FaSearch className="text-gray-500 dark:text-gray-300 mr-3" />
-      <input
-        type="text"
-        placeholder="Search by description or location..."
-        className="w-full px-4 py-2 border-none focus:outline-none focus:ring-1 focus:ring-blue-500 bg-transparent dark:text-white rounded-lg"
-        value={query}
-        onChange={(e) => onQueryChange(e.target.value)}
-      />
+    <div className="w-full max-w-3xl mx-auto px-4">
+      <div
+        className="flex items-center gap-3 p-3 sm:p-4 rounded-full bg-white/60 dark:bg-white/10
+        backdrop-blur-md border border-white/30 dark:border-white/20 shadow-lg hover:shadow-xl
+        transition-all duration-300"
+      >
+        <div className="flex items-center justify-center p-2 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 shadow-md">
+          <FaSearch className="h-4 w-4 text-white" />
+        </div>
+        <input
+          type="text"
+          placeholder="Search by description or location..."
+          className="flex-1 bg-transparent text-sm sm:text-base placeholder-gray-500 dark:placeholder-gray-400
+          text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500
+          px-2 py-1 transition-all duration-200"
+          value={query}
+          onChange={(e) => onQueryChange(e.target.value)}
+        />
+      </div>
     </div>
   );
 }

@@ -13,6 +13,38 @@ import "react-datepicker/dist/react-datepicker.css";
 import WhatsHappening from "./WhatsHappening";
 import SearchBar from "./SearchBar";
 
+// import { Card, CardContent } from "@/app/components/ui/card";
+// import { Button } from "@/app/components/ui/button";
+// import { ScrollArea } from "@/app/components/ui/scroll-area";
+// import { Badge } from "@/app/components/ui/badge";
+
+// Patch: Make WhatsHappening scrollable
+import { ScrollArea as SidebarScrollArea } from "@/app/components/ui/scroll-area";
+
+// Patch: Expandable description
+// import { useRef } from "react";
+
+// const ExpandableText = ({ text }: { text: string }) => {
+//   const [expanded, setExpanded] = useState(false);
+//   const toggleExpanded = () => setExpanded(!expanded);
+//   const shouldShowButton = text.length > 150;
+//   const shortText = text.slice(0, 150) + (shouldShowButton ? "..." : "");
+
+//   return (
+//     <div>
+//       <p>{expanded ? text : shortText}</p>
+//       {shouldShowButton && (
+//         <Button
+//           className="px-0 text-blue-600 dark:text-blue-400"
+//           onClick={toggleExpanded}
+//         >
+//           {expanded ? "Show Less" : "Read More"}
+//         </Button>
+//       )}
+//     </div>
+//   );
+// };
+
 type CrimeReport = {
   id: string;
   description: string;
@@ -84,7 +116,11 @@ export default function Home() {
         console.error("Error fetching crimes:", error);
         setReports([]);
       } else {
-        setReports(data as CrimeReport[]);
+        const sortedReports = (data as CrimeReport[]).sort(
+          (a, b) =>
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        );
+        setReports(sortedReports);
       }
       setLoading(false);
     };
@@ -109,19 +145,26 @@ export default function Home() {
       <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col lg:flex-row gap-6">
         {/* Main Content */}
         <div className="w-full lg:w-2/3">
-          <div className="w-full px-4 py-6 rounded-lg shadow-lg bg-white dark:bg-gray-800">
+          {/* Sticky Search and Filters */}
+          <div className="sticky top-0 z-50 bg-gray-50 dark:bg-gray-900 pt-2 pb-4 space-y-4">
             <SearchBar query={query} onQueryChange={setQuery} />
 
             {/* Filters */}
-            <div className="flex flex-wrap gap-4 items-center mb-6 bg-gray-100 dark:bg-gray-700 p-4 rounded-lg shadow-md border border-gray-200 dark:border-gray-600">
-              <FaFilter className="text-gray-500 dark:text-gray-300 mr-2" />
+            <div className="flex flex-wrap gap-4 items-center bg-white dark:bg-gray-800 p-5 rounded-lg shadow-md border border-gray-300 dark:border-gray-700">
+              <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400">
+                <FaFilter className="text-lg" />
+                <span className="font-semibold text-base">Filters</span>
+              </div>
 
-              <label htmlFor="rating-filter" className="font-semibold text-sm">
+              <label
+                htmlFor="rating-filter"
+                className="font-medium text-gray-700 dark:text-gray-300 min-w-[90px]"
+              >
                 Rating:
               </label>
               <select
                 id="rating-filter"
-                className="bg-white dark:bg-gray-600 text-gray-800 dark:text-white border border-gray-300 dark:border-gray-500 rounded-lg p-2 text-sm"
+                className="min-w-[140px] bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 value={selectedRatingRange}
                 onChange={(e) => setSelectedRatingRange(e.target.value)}
               >
@@ -131,12 +174,15 @@ export default function Home() {
                 <option value="7-10">7–10 (High Risk)</option>
               </select>
 
-              <label htmlFor="date-filter" className="font-semibold text-sm">
+              <label
+                htmlFor="date-filter"
+                className="font-medium text-gray-700 dark:text-gray-300 min-w-[90px]"
+              >
                 Date:
               </label>
               <select
                 id="date-filter"
-                className="bg-white dark:bg-gray-600 text-gray-800 dark:text-white border border-gray-300 dark:border-gray-500 rounded-lg p-2 text-sm"
+                className="min-w-[140px] bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 value={selectedDateRangeOption}
                 onChange={(e) => {
                   setSelectedDateRangeOption(e.target.value);
@@ -153,7 +199,7 @@ export default function Home() {
               </select>
 
               {selectedDateRangeOption === "range" && (
-                <div className="flex items-center">
+                <div className="min-w-[220px]">
                   <DatePicker
                     selectsRange
                     startDate={startDate}
@@ -162,13 +208,15 @@ export default function Home() {
                     isClearable
                     dateFormat="dd/MM/yyyy"
                     placeholderText="Select Date Range"
-                    className="bg-white dark:bg-gray-600 text-gray-800 dark:text-white border border-gray-300 dark:border-gray-500 rounded-lg p-2 text-sm"
+                    className="w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
               )}
             </div>
+          </div>
 
-            {/* Report List */}
+          {/* Report List */}
+          <div className="w-full px-2 py-4">
             {loading ? (
               <p className="text-gray-600 dark:text-gray-400">Loading...</p>
             ) : reports.length === 0 ? (
@@ -177,27 +225,21 @@ export default function Home() {
               </p>
             ) : (
               <div className="space-y-4">
-                {reports.map((report) => {
-                  const displayDescription =
-                    report.description.length > 150
-                      ? report.description.slice(0, 150) + "..."
-                      : report.description;
-
-                  return (
-                    <ReportCardDetail
-                      key={report.id}
-                      report={{ ...report, description: displayDescription }}
-                    />
-                  );
-                })}
+                {reports.map((report) => (
+                  <ReportCardDetail key={report.id} report={{ ...report }} />
+                ))}
               </div>
             )}
           </div>
         </div>
 
-        {/* Right Column: Hidden on mobile */}
+        {/* WhatsHappening Sidebar */}
         <div className="hidden lg:block w-full lg:w-1/3">
-          <WhatsHappening />
+          <div className="sticky top-0 z-40">
+            <SidebarScrollArea className="h-[calc(100vh-3rem)] pr-2">
+              <WhatsHappening />
+            </SidebarScrollArea>
+          </div>
         </div>
       </div>
     </div>

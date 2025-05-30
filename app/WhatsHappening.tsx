@@ -1,9 +1,32 @@
+// app/components/WhatsHappening.tsx
 "use client";
 
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
-import { FaMapMarkerAlt } from "react-icons/fa";
 import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase"; // Ensure this path is correct
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/app/components/ui/card"; // Adjust path as needed
+import { Badge } from "@/app/components/ui/badge"; // Adjust path as needed
+import { Button } from "@/app/components/ui/button"; // Adjust path as needed
+import { ScrollArea } from "@/app/components/ui/scroll-area"; // Adjust path as needed
+
+// Lucide React icons
+import { MapPin, Star, Clock, ChevronDown, BellRing } from "lucide-react"; // Added BellRing for a "news/alert" feel
+
+// You'll need to configure your fonts in your Tailwind CSS config or global CSS
+// For example, in tailwind.config.js:
+// theme: {
+//   extend: {
+//     fontFamily: {
+//       sans: ['Inter', 'sans-serif'], // Or define as a variable if using @next/font/google
+//       heading: ['Montserrat', 'sans-serif'], // Example for a distinct heading font
+//     },
+//   },
+// },
 
 type CrimeReport = {
   id: string;
@@ -20,7 +43,13 @@ function extractCity(location: string) {
   return location;
 }
 
-export default function WhatsHappening() {
+interface WhatsHappeningProps {
+  className?: string;
+}
+
+export default function WhatsHappening({
+  className = "",
+}: WhatsHappeningProps) {
   const [reports, setReports] = useState<CrimeReport[]>([]);
   const [loading, setLoading] = useState(false);
   const [limit, setLimit] = useState(5);
@@ -56,81 +85,130 @@ export default function WhatsHappening() {
     setLimit((prev) => prev + 5);
   };
 
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleString(undefined, {
+      dateStyle: "medium",
+      timeStyle: "short",
+    });
+  };
+
+  const getRatingColor = (rating: number) => {
+    if (rating >= 7) return "text-green-700 bg-green-100 border-green-300"; // High Risk - Slightly darker text, lighter background
+    if (rating >= 4) return "text-yellow-700 bg-yellow-100 border-yellow-300"; // Medium Risk
+    return "text-red-700 bg-red-100 border-red-300"; // Low Risk - Assuming lower rating means higher risk/severity here based on color
+  };
+
   return (
-    <aside
-      className="relative w-full max-w-md p-6 bg-white text-black dark:bg-gray-900 dark:text-white rounded-lg shadow-lg transition-colors duration-300"
-      style={{
-        maxHeight: expanded ? "400px" : "calc(5 * 7.5rem + 2.5rem)",
-        overflowY: expanded ? "auto" : "hidden",
-        transition: "max-height 0.3s ease",
-      }}
-    >
-      <h2 className="text-2xl font-bold mb-6 border-b border-gray-300 dark:border-gray-700 pb-3 sticky top-0 bg-white dark:bg-gray-900 z-10">
-        What&apos;s Happening{" "}
-        <span className="text-xs">(work in progress)</span>
-      </h2>
+    <Card className={`w-full max-w-md h-[600px] flex flex-col ${className}`}>
+      <CardHeader className="flex-shrink-0 pb-4 border-b border-border/60">
+        {" "}
+        {/* Added a subtle border */}
+        <CardTitle className="flex items-center text-2xl font-heading text-gray-800">
+          {" "}
+          {/* Using font-heading, larger text */}
+          <BellRing className="h-6 w-6 mr-3 text-blue-600 animate-pulse" />{" "}
+          {/* Thematic icon with subtle animation */}
+          Whats`&apos;`Happening
+        </CardTitle>
+      </CardHeader>
 
-      {loading && (
-        <p className="text-center text-gray-500 dark:text-gray-400">
-          Loading reports...
-        </p>
-      )}
-
-      {!loading && reports.length === 0 && (
-        <p className="text-center text-gray-500 dark:text-gray-400">
-          No reports found.
-        </p>
-      )}
-
-      <ul className="space-y-6">
-        {reports.map(({ id, location, description, rating, created_at }) => (
-          <li
-            key={id}
-            onClick={() => handlePostClick(id)}
-            className="cursor-pointer p-4 rounded-lg border border-gray-200 dark:border-gray-700
-                       hover:shadow-lg hover:bg-sky-50 dark:hover:bg-sky-900
-                       transition-all duration-300 hover:scale-[1.01]"
-            style={{ minHeight: "7.5rem" }}
-          >
-            <p className="text-lg font-medium mb-2 line-clamp-3">
-              {description}
-            </p>
-
-            <div className="flex justify-between text-sm text-gray-500 dark:text-gray-400 mb-1">
-              <span className="flex items-center gap-1">
-                <FaMapMarkerAlt className="text-sky-500" />
-                {extractCity(location)}
-              </span>
-
-              <span className="flex items-center text-yellow-500 font-semibold gap-1">
-                <span>⭐</span>
-                <span>{rating}</span>
-              </span>
+      <CardContent className="flex-1 p-0 overflow-hidden font-sans">
+        {" "}
+        {/* Applied font-sans */}
+        {loading ? (
+          <div className="flex items-center justify-center h-full">
+            <div className="flex flex-col items-center space-y-3">
+              <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-600"></div>{" "}
+              {/* Slightly larger spinner */}
+              <p className="text-base text-muted-foreground">
+                Loading reports...
+              </p>
             </div>
+          </div>
+        ) : reports.length === 0 ? (
+          <div className="flex items-center justify-center h-full">
+            <div className="text-center space-y-3">
+              <MapPin className="h-16 w-16 text-muted-foreground mx-auto text-blue-400" />{" "}
+              {/* Larger, colored icon */}
+              <p className="text-lg text-muted-foreground">
+                No recent reports found.
+              </p>{" "}
+              {/* More descriptive text */}
+            </div>
+          </div>
+        ) : (
+          <div className="h-full flex flex-col">
+            <ScrollArea
+              className={`flex-1 px-6 ${expanded ? "pb-4" : "pb-16"}`}
+            >
+              <div className="space-y-4 pt-4">
+                {" "}
+                {/* Added some top padding */}
+                {reports.map((report) => (
+                  <div
+                    key={report.id}
+                    onClick={() => handlePostClick(report.id)}
+                    className="group cursor-pointer p-4 rounded-xl border border-gray-200 
+                               hover:border-blue-300 hover:shadow-lg hover:bg-blue-50/50
+                               transition-all duration-200 hover:scale-[1.01] active:scale-[0.99]
+                               transform-gpu" // Added transform-gpu for smoother animations
+                  >
+                    <div className="space-y-3">
+                      <p className="text-base font-medium leading-relaxed line-clamp-3 text-gray-700 group-hover:text-blue-800">
+                        {report.description}
+                      </p>
 
-            <p className="text-xs text-gray-400 dark:text-gray-500">
-              {new Date(created_at).toLocaleString(undefined, {
-                dateStyle: "medium",
-                timeStyle: "short",
-              })}
-            </p>
-          </li>
-        ))}
-      </ul>
+                      <div className="flex items-center justify-between mt-2">
+                        <div className="flex items-center space-x-1 text-sm text-gray-500">
+                          <MapPin className="h-4 w-4 text-blue-500" />
+                          <span className="truncate max-w-[160px] font-semibold">
+                            {extractCity(report.location)}
+                          </span>
+                        </div>
 
-      {!expanded && reports.length >= 5 && (
-        <>
-          <div className="pointer-events-none absolute bottom-14 left-0 w-full h-20 bg-gradient-to-b from-transparent to-white dark:to-gray-900 z-10" />
+                        <Badge
+                          className={`text-sm font-bold px-3 py-1 rounded-full ${getRatingColor(
+                            report.rating
+                          )}`}
+                        >
+                          <Star className="h-4 w-4 mr-1 fill-current" />
+                          {report.rating}/10
+                        </Badge>
+                      </div>
 
-          <button
-            onClick={showMore}
-            className="absolute bottom-2 left-1/2 transform -translate-x-1/2 px-6 py-2 bg-sky-600 hover:bg-sky-700 
-                       text-white rounded-full shadow-md transition hover:scale-105 active:scale-95 z-20"
-          >
-            Show More
-          </button>
-        </>
-      )}
-    </aside>
+                      <div className="flex items-center text-xs text-gray-500 mt-2">
+                        <Clock className="h-3.5 w-3.5 mr-1.5" />
+                        <span>{formatDate(report.created_at)}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </ScrollArea>
+
+            {!expanded && reports.length >= 5 && (
+              <div className="relative flex-shrink-0">
+                <div className="absolute inset-x-0 top-0 h-12 bg-gradient-to-b from-transparent to-white pointer-events-none" />{" "}
+                {/* Adjusted gradient height and color to match background */}
+                <div className="px-6 py-4 bg-white">
+                  {" "}
+                  {/* Assuming white background */}
+                  <Button
+                    onClick={showMore}
+                    variant="outline"
+                    size="lg" // Slightly larger button
+                    className="w-full text-blue-600 border-blue-300 hover:bg-blue-50 hover:text-blue-700 transition-colors duration-200"
+                  >
+                    <ChevronDown className="h-5 w-5 mr-2" />{" "}
+                    {/* Slightly larger icon */}
+                    Show More Reports
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }
