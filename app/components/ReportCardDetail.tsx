@@ -185,12 +185,14 @@ export default function ReportCardDetail({ report }: ReportCardDetailProps) {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2 border-t border-gray-100 dark:border-gray-700">
+          <div className="flex flex-row sm:flex-row sm:items-center justify-between gap-4 pt-2 border-t border-gray-100 dark:border-gray-700">
             <VoteButtons
               reportid={report.id}
               userid="00000000-0000-0000-0000-000000000000"
             />
-            <ShareButton reportId={report.id} />
+            <div className="w-fit">
+              <ShareButton reportId={report.id} />
+            </div>
           </div>
           <div>
             <CommentSection reportId={report.id} />
