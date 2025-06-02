@@ -158,56 +158,66 @@ export default function Home() {
             <SearchBar query={query} onQueryChange={setQuery} />
 
             {/* Filters */}
-            <div className="flex flex-wrap gap-4 items-center bg-white dark:bg-gray-800 p-5 rounded-lg shadow-md border border-gray-300 dark:border-gray-700">
+            {/* Filters */}
+            <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-4 items-start sm:items-center bg-white dark:bg-gray-800 p-4 sm:p-5 rounded-lg shadow-md border border-gray-300 dark:border-gray-700">
               <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400">
-                <FaFilter className="text-lg" />
-                <span className="font-semibold text-base">Filters</span>
+                <FaFilter className="text-base sm:text-lg" />
+                <span className="font-semibold text-sm sm:text-base">
+                  Filters
+                </span>
               </div>
 
-              <label
-                htmlFor="rating-filter"
-                className="font-medium text-gray-700 dark:text-gray-300 min-w-[90px]"
-              >
-                Rating:
-              </label>
-              <select
-                id="rating-filter"
-                className="min-w-[140px] bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                value={selectedRatingRange}
-                onChange={(e) => setSelectedRatingRange(e.target.value)}
-              >
-                <option value="all">All Ratings</option>
-                <option value="0-3">0–3 (Low Risk)</option>
-                <option value="4-6">4–6 (Medium Risk)</option>
-                <option value="7-10">7–10 (High Risk)</option>
-              </select>
+              {/* Rating Filter */}
+              <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 w-full sm:w-auto text-sm">
+                <label
+                  htmlFor="rating-filter"
+                  className="font-medium text-gray-700 dark:text-gray-300 min-w-[70px]"
+                >
+                  Rating:
+                </label>
+                <select
+                  id="rating-filter"
+                  className="w-full sm:min-w-[120px] bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded px-2 py-1 sm:px-3 sm:py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  value={selectedRatingRange}
+                  onChange={(e) => setSelectedRatingRange(e.target.value)}
+                >
+                  <option value="all">All Ratings</option>
+                  <option value="0-3">0–3</option>
+                  <option value="4-6">4–6</option>
+                  <option value="7-10">7–10</option>
+                </select>
+              </div>
 
-              <label
-                htmlFor="date-filter"
-                className="font-medium text-gray-700 dark:text-gray-300 min-w-[90px]"
-              >
-                Date:
-              </label>
-              <select
-                id="date-filter"
-                className="min-w-[140px] bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                value={selectedDateRangeOption}
-                onChange={(e) => {
-                  setSelectedDateRangeOption(e.target.value);
-                  if (e.target.value !== "range") {
-                    setDateRange([null, null]);
-                  }
-                }}
-              >
-                <option value="all">All Dates</option>
-                <option value="last24h">Last 24 Hours</option>
-                <option value="last7d">Last 7 Days</option>
-                <option value="last30d">Last 30 Days</option>
-                <option value="range">Date Range</option>
-              </select>
+              {/* Date Filter */}
+              <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 w-full sm:w-auto text-sm">
+                <label
+                  htmlFor="date-filter"
+                  className="font-medium text-gray-700 dark:text-gray-300 min-w-[70px]"
+                >
+                  Date:
+                </label>
+                <select
+                  id="date-filter"
+                  className="w-full sm:min-w-[120px] bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded px-2 py-1 sm:px-3 sm:py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  value={selectedDateRangeOption}
+                  onChange={(e) => {
+                    setSelectedDateRangeOption(e.target.value);
+                    if (e.target.value !== "range") {
+                      setDateRange([null, null]);
+                    }
+                  }}
+                >
+                  <option value="all">All Dates</option>
+                  <option value="last24h">Last 24h</option>
+                  <option value="last7d">Last 7d</option>
+                  <option value="last30d">Last 30d</option>
+                  <option value="range">Range</option>
+                </select>
+              </div>
 
+              {/* Date Range Picker */}
               {selectedDateRangeOption === "range" && (
-                <div className="min-w-[220px]">
+                <div className="w-full sm:w-auto min-w-[200px] text-sm">
                   <DatePicker
                     selectsRange
                     startDate={startDate}
@@ -215,18 +225,19 @@ export default function Home() {
                     onChange={(update) => handleDateRangeChange(update)}
                     isClearable
                     dateFormat="dd/MM/yyyy"
-                    placeholderText="Select Date Range"
-                    className="w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholderText="Select Range"
+                    className="w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded px-2 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
               )}
             </div>
           </div>
+
           {/* Tab Switcher */}
-          <div className="mt-4">
-            <div className="flex border-b border-gray-300 dark:border-gray-700 w-full overflow-auto">
+          <div className="mt-4 overflow-x-auto">
+            <div className="flex border-b border-gray-300 dark:border-gray-700 w-max min-w-full">
               <button
-                className={`flex-1 min-w-[120px] px-4 py-2 text-center text-sm font-semibold ${
+                className={`min-w-[120px] px-4 py-2 text-sm font-semibold ${
                   activeTab === "reports"
                     ? "border-b-2 border-blue-600 text-blue-600 dark:text-blue-400"
                     : "text-gray-600 dark:text-gray-300"
@@ -236,7 +247,7 @@ export default function Home() {
                 Reports
               </button>
               <button
-                className={`flex-1 min-w-[120px] px-4 py-2 text-center text-sm font-semibold ${
+                className={`min-w-[120px] px-4 py-2 text-sm font-semibold ${
                   activeTab === "news"
                     ? "border-b-2 border-blue-600 text-blue-600 dark:text-blue-400"
                     : "text-gray-600 dark:text-gray-300"

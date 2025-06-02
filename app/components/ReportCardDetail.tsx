@@ -24,7 +24,7 @@ interface ReportCardDetailProps {
 export default function ReportCardDetail({ report }: ReportCardDetailProps) {
   const [showFullLocation, setShowFullLocation] = useState(false);
 
-  const safetyRating = Math.abs(10 - report.rating) || 1;
+  const safetyRating = Math.abs(report.rating) || 1;
   // const getRatingColor = (rating: number) => {
   //   if (rating >= 8) return "text-emerald-600 dark:text-emerald-400";
   //   if (rating >= 6) return "text-yellow-600 dark:text-yellow-400";
@@ -44,14 +44,13 @@ export default function ReportCardDetail({ report }: ReportCardDetailProps) {
   };
 
   return (
-    <div className="group relative bg-white dark:bg-gray-800 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-700 overflow-hidden">
-      {/* Gradient overlay for subtle depth */}
+    <div className="group relative bg-white dark:bg-gray-800 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-700 overflow-hidden w-full">
       <Link key={report.id} href={`/reports/${report.id}`} passHref>
         <div className="absolute inset-0 bg-gradient-to-br from-white/50 via-transparent to-gray-50/30 dark:from-gray-800/50 dark:to-gray-900/30 pointer-events-none" />
 
-        <div className="relative p-6 space-y-4">
+        <div className="relative p-4 sm:p-6 space-y-4">
           {/* Header Section */}
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-center space-x-3">
               <div className="relative">
                 <div className="w-10 h-10 bg-gradient-to-br from-gray-500 to-gray-600 dark:from-gray-600 dark:to-gray-700 rounded-full flex items-center justify-center shadow-sm">
@@ -73,7 +72,7 @@ export default function ReportCardDetail({ report }: ReportCardDetailProps) {
             <div className="flex items-center space-x-2 bg-gray-50 dark:bg-gray-700/50 px-3 py-1.5 rounded-lg">
               <Shield className="w-4 h-4 text-gray-600 dark:text-gray-400" />
               <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
-                Safety:
+                Safety Rating:
               </span>
               <div className="flex items-center space-x-0.5">
                 {Array.from({ length: 5 }).map((_, index) => {
@@ -83,8 +82,8 @@ export default function ReportCardDetail({ report }: ReportCardDetailProps) {
                       key={index}
                       xmlns="http://www.w3.org/2000/svg"
                       className="w-4 h-4"
-                      fill={filled ? "#facc15" : "none"} // yellow-400 fill or none
-                      stroke="#facc15" // yellow border for empty stars
+                      fill={filled ? "#facc15" : "none"}
+                      stroke="#facc15"
                       viewBox="0 0 24 24"
                     >
                       <path
@@ -118,11 +117,9 @@ export default function ReportCardDetail({ report }: ReportCardDetailProps) {
           )}
 
           {/* Description */}
-          <div className="space-y-2">
-            <p className="text-gray-800 dark:text-gray-200 leading-relaxed text-sm">
-              {report.description}
-            </p>
-          </div>
+          <p className="text-gray-800 dark:text-gray-200 leading-relaxed text-sm">
+            {report.description}
+          </p>
 
           {/* Location Section */}
           <div className="relative">
@@ -154,7 +151,7 @@ export default function ReportCardDetail({ report }: ReportCardDetailProps) {
 
             {/* Full Location Popup */}
             {showFullLocation && (
-              <div className="absolute top-full left-0 z-50 mt-2 w-full max-w-sm">
+              <div className="absolute top-full left-0 z-50 mt-2 w-full max-w-xs sm:max-w-sm">
                 <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl shadow-xl p-4">
                   <div className="flex items-start justify-between space-x-2">
                     <div className="flex items-start space-x-2 flex-1">
@@ -188,7 +185,7 @@ export default function ReportCardDetail({ report }: ReportCardDetailProps) {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-gray-700">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2 border-t border-gray-100 dark:border-gray-700">
             <VoteButtons
               reportid={report.id}
               userid="00000000-0000-0000-0000-000000000000"
