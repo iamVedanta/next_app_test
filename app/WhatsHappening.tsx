@@ -92,11 +92,11 @@ export default function WhatsHappening({
     });
   };
 
-  const getRatingColor = (rating: number) => {
-    if (rating >= 7) return "text-green-700 bg-green-100 border-green-300"; // High Risk - Slightly darker text, lighter background
-    if (rating >= 4) return "text-yellow-700 bg-yellow-100 border-yellow-300"; // Medium Risk
-    return "text-red-700 bg-red-100 border-red-300"; // Low Risk - Assuming lower rating means higher risk/severity here based on color
-  };
+  // const getRatingColor = (rating: number) => {
+  //   if (rating >= 7) return "text-green-700 bg-green-100 border-green-300"; // High Risk - Slightly darker text, lighter background
+  //   if (rating >= 4) return "text-yellow-700 bg-yellow-100 border-yellow-300"; // Medium Risk
+  //   return "text-red-700 bg-red-100 border-red-300"; // Low Risk - Assuming lower rating means higher risk/severity here based on color
+  // };
 
   return (
     <Card className={`w-full max-w-md h-[600px] flex flex-col ${className}`}>
@@ -108,7 +108,7 @@ export default function WhatsHappening({
           {/* Using font-heading, larger text */}
           <BellRing className="h-6 w-6 mr-3 text-blue-600 animate-pulse" />{" "}
           {/* Thematic icon with subtle animation */}
-          Whats`&apos;`Happening
+          What&apos;s Happening
         </CardTitle>
       </CardHeader>
 
@@ -165,14 +165,27 @@ export default function WhatsHappening({
                             {extractCity(report.location)}
                           </span>
                         </div>
-
                         <Badge
-                          className={`text-sm font-bold px-3 py-1 rounded-full ${getRatingColor(
+                          className={`text-sm font-bold px-3 py-1 rounded-full flex items-center space-x-1`}
+                        >
+                          {/* 
+                          <Badge
+                          className={`text-sm font-bold px-3 py-1 rounded-full flex items-center space-x-1 ${getRatingColor(
                             report.rating
                           )}`}
-                        >
-                          <Star className="h-4 w-4 mr-1 fill-current" />
-                          {report.rating}/10
+                        ></Badge> */}
+                          <div className="flex items-center space-x-0.5">
+                            {[...Array(5)].map((_, index) => (
+                              <Star
+                                key={index}
+                                className={`h-4 w-4 ${
+                                  report.rating / 2 > index
+                                    ? "fill-current text-yellow-500"
+                                    : "text-gray-300"
+                                }`}
+                              />
+                            ))}
+                          </div>
                         </Badge>
                       </div>
 

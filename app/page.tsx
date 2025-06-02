@@ -13,38 +13,9 @@ import "react-datepicker/dist/react-datepicker.css";
 import WhatsHappening from "./WhatsHappening";
 import SearchBar from "./SearchBar";
 
-// import { Card, CardContent } from "@/app/components/ui/card";
-// import { Button } from "@/app/components/ui/button";
-// import { ScrollArea } from "@/app/components/ui/scroll-area";
-// import { Badge } from "@/app/components/ui/badge";
-
-// Patch: Make WhatsHappening scrollable
 import { ScrollArea as SidebarScrollArea } from "@/app/components/ui/scroll-area";
 
-// Patch: Expandable description
-// import { useRef } from "react";
-
-// const ExpandableText = ({ text }: { text: string }) => {
-//   const [expanded, setExpanded] = useState(false);
-//   const toggleExpanded = () => setExpanded(!expanded);
-//   const shouldShowButton = text.length > 150;
-//   const shortText = text.slice(0, 150) + (shouldShowButton ? "..." : "");
-
-//   return (
-//     <div>
-//       <p>{expanded ? text : shortText}</p>
-//       {shouldShowButton && (
-//         <Button
-//           className="px-0 text-blue-600 dark:text-blue-400"
-//           onClick={toggleExpanded}
-//         >
-//           {expanded ? "Show Less" : "Read More"}
-//         </Button>
-//       )}
-//     </div>
-//   );
-// };
-
+// Define the CrimeReport type, including the 'url' property as it might be present in the database
 type CrimeReport = {
   id: string;
   description: string;
@@ -53,6 +24,10 @@ type CrimeReport = {
   rating: number;
   created_at: string;
   crimes: string[];
+  upvotes: number | 0;
+  downvotes: number | 0;
+  url?: string; // Add url to the CrimeReport type as it exists in your CrimeDB table
+  category?: string; // Add category to the CrimeReport type as it's used in mapping
 };
 
 export default function Home() {
@@ -67,6 +42,7 @@ export default function Home() {
   const debouncedQuery = useDebounce(query, 300);
   const [reports, setReports] = useState<CrimeReport[]>([]);
   const [loading, setLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState<"reports" | "news">("reports");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -111,12 +87,43 @@ export default function Home() {
         }
       }
 
-      const { data, error } = await supabaseQuery;
+      // Filter based on activeTab (reports or news)
+      if (activeTab === "reports") {
+        supabaseQuery = supabaseQuery.is("url", null); // url is null for reports
+      } else if (activeTab === "news") {
+        supabaseQuery = supabaseQuery.not("url", "is", null); // url is not null for news
+      }
+
+      // Explicitly type the data returned from Supabase
+      const { data, error } = await supabaseQuery.returns<CrimeReport[]>();
+
       if (error) {
         console.error("Error fetching crimes:", error);
         setReports([]);
       } else {
-        const sortedReports = (data as CrimeReport[]).sort(
+        // Map the raw data to the CrimeReport type, handling potential undefined 'crimes' or 'category'
+        const formattedReports: CrimeReport[] = (data || []).map((report) => ({
+          id: String(report.id),
+          description: report.description,
+          location: report.location,
+          // Use 'category' for 'tags' and fallback to 'category' for 'crimes' if 'crimes' is not present
+          tags: report.category ? [report.category] : [],
+          rating: report.rating,
+          created_at: report.created_at,
+          crimes:
+            report.crimes && report.crimes.length > 0
+              ? report.crimes
+              : report.category
+              ? [report.category]
+              : [],
+          upvotes: report.upvotes || 0,
+          downvotes: report.downvotes || 0,
+          url: report.url, // Include the url
+          category: report.category, // Include category if it exists in the database
+        }));
+
+        // Sort the reports by created_at in descending order
+        const sortedReports = formattedReports.sort(
           (a, b) =>
             new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
         );
@@ -133,6 +140,7 @@ export default function Home() {
     selectedDateRangeOption,
     startDate,
     endDate,
+    activeTab,
   ]);
 
   const handleDateRangeChange = (dates: [Date | null, Date | null]) => {
@@ -212,6 +220,31 @@ export default function Home() {
                   />
                 </div>
               )}
+            </div>
+          </div>
+          {/* Tab Switcher */}
+          <div className="mt-4">
+            <div className="flex border-b border-gray-300 dark:border-gray-700 w-full overflow-auto">
+              <button
+                className={`flex-1 min-w-[120px] px-4 py-2 text-center text-sm font-semibold ${
+                  activeTab === "reports"
+                    ? "border-b-2 border-blue-600 text-blue-600 dark:text-blue-400"
+                    : "text-gray-600 dark:text-gray-300"
+                }`}
+                onClick={() => setActiveTab("reports")}
+              >
+                Reports
+              </button>
+              <button
+                className={`flex-1 min-w-[120px] px-4 py-2 text-center text-sm font-semibold ${
+                  activeTab === "news"
+                    ? "border-b-2 border-blue-600 text-blue-600 dark:text-blue-400"
+                    : "text-gray-600 dark:text-gray-300"
+                }`}
+                onClick={() => setActiveTab("news")}
+              >
+                News Reports
+              </button>
             </div>
           </div>
 

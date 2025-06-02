@@ -14,6 +14,8 @@ interface Report {
   rating: number;
   created_at: string;
   crimes: string[];
+  upvotes: number | 0; // optional, if not available in the data
+  downvotes: number | 0; // optional, if not available in the data
 }
 
 export default function ReportPage() {
@@ -47,6 +49,8 @@ export default function ReportPage() {
           rating: data.rating,
           created_at: data.created_at,
           crimes: data.crimes ? data.crimes : [data.category], // fallback
+          upvotes: data.upvotes || 0,
+          downvotes: data.downvotes || 0,
         };
 
         setReportData(formattedReport);
